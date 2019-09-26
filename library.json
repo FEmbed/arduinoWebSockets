@@ -20,6 +20,6 @@
             "tests"
         ]
     },
-    "frameworks": "arduino",
-    "platforms": "atmelavr, espressif8266, espressif32"
+    "frameworks": "arduino, esp8266-rtos-sdk",
+    "platforms": "custom8266, atmelavr, espressif8266, espressif32"
 }

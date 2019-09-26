@@ -6,7 +6,11 @@ For details, see http://sourceforge.net/projects/libb64
 */
 
 #ifdef ESP8266
+#ifdef USE_FEMBED_LWIP
+#define CORE_HAS_LIBB64
+#else
 #include <core_esp8266_features.h>
+#endif
 #endif
 
 #if defined(ESP32)

@@ -24,7 +24,9 @@
 
 #include "WebSockets.h"
 
-#ifdef ESP8266
+#if defined(USE_FEMBED_LWIP)
+#define CORE_HAS_LIBB64
+#elif defined(ESP8266)
 #include <core_esp8266_features.h>
 #endif
 
@@ -36,7 +38,7 @@ extern "C" {
 #endif
 }
 
-#ifdef ESP8266
+#if defined(ESP8266) && !defined(USE_FEMBED_LWIP)
 #include <Hash.h>
 #elif defined(ESP32)
 #include <hwcrypto/sha.h>
@@ -532,7 +534,7 @@ void WebSockets::handleWebsocketPayloadCb(WSclient_t * client, bool ok, uint8_t 
  */
 String WebSockets::acceptKey(String & clientKey) {
     uint8_t sha1HashBin[20] = { 0 };
-#ifdef ESP8266
+#if defined(ESP8266) && !defined(USE_FEMBED_LWIP)
     sha1(clientKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", &sha1HashBin[0]);
 #elif defined(ESP32)
     String data = clientKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";

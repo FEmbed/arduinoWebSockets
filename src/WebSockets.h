@@ -53,7 +53,19 @@
 #define NODEBUG_WEBSOCKETS
 #endif
 
-#if defined(ESP8266) || defined(ESP32)
+#ifdef USE_FEMBED_LWIP
+#define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)
+#define WEBSOCKETS_USE_BIG_MEM
+
+#if defined(ESP8266)
+#include "esp_system.h"
+#define GET_FREE_HEAP esp_get_free_heap_size()
+
+#define ESP8266_DREG(addr) *((volatile uint32_t *)(0x3FF00000+(addr)))
+#define RANDOM_REG32  ESP8266_DREG(0x20E44)
+#endif
+
+#elif defined(ESP8266) || defined(ESP32)
 
 #define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)
 #define WEBSOCKETS_USE_BIG_MEM
@@ -84,13 +96,16 @@
 #define NETWORK_ENC28J60 (3)
 #define NETWORK_ESP32 (4)
 #define NETWORK_ESP32_ETH (5)
+#define NETWORK_FEMBED    (9)
 
 // max size of the WS Message Header
 #define WEBSOCKETS_MAX_HEADER_SIZE (14)
 
 #if !defined(WEBSOCKETS_NETWORK_TYPE)
 // select Network type based
-#if defined(ESP8266) || defined(ESP31B)
+#if defined(USE_FEMBED_LWIP)
+#define WEBSOCKETS_NETWORK_TYPE NETWORK_FEMBED
+#elif defined(ESP8266) || defined(ESP31B)
 #define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266
 //#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266_ASYNC
 //#define WEBSOCKETS_NETWORK_TYPE NETWORK_W5100
@@ -173,7 +188,13 @@
 #include <ETH.h>
 #define WEBSOCKETS_NETWORK_CLASS WiFiClient
 #define WEBSOCKETS_NETWORK_SERVER_CLASS WiFiServer
-
+#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_FEMBED)
+#include <TCPClient.h>
+#include <TCPServer.h>
+#include <TCPClientSecure.h>
+#define WEBSOCKETS_NETWORK_CLASS FEmbed::TCPClient
+#define WEBSOCKETS_NETWORK_SSL_CLASS FEmbed::TCPClientSecure
+#define WEBSOCKETS_NETWORK_SERVER_CLASS FEmbed::TCPServer
 #else
 #error "no network type selected!"
 #endif

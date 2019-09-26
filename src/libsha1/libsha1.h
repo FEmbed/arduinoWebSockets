@@ -5,7 +5,7 @@ By Steve Reid <steve@edmweb.com>
 100% Public Domain
 */
 
-#if !defined(ESP8266) && !defined(ESP32)
+#if defined(USE_FEMBED_LWIP) || (!defined(ESP8266) && !defined(ESP32))
 
 typedef struct {
     uint32_t state[5];
