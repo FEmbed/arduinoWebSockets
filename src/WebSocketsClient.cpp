@@ -518,11 +518,10 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
     for(uint8_t i = 0; i < sizeof(randomKey); i++) {
         randomKey[i] = random(0xFF);
     }
-
     client->cKey = base64_encode(&randomKey[0], 16);
 
 #ifndef NODEBUG_WEBSOCKETS
-    unsigned long start = micros();
+    unsigned long start = millis();
 #endif
 
     String handshake;
@@ -538,7 +537,6 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
             url += client->cSessionId;
         }
     }
-
     handshake = WEBSOCKETS_STRING("GET ");
     handshake += url + WEBSOCKETS_STRING(
                            " HTTP/1.1\r\n"
@@ -584,7 +582,6 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
     }
 
     handshake += NEW_LINE;
-
     DEBUG_WEBSOCKETS("[WS-Client][sendHeader] handshake %s", (uint8_t *)handshake.c_str());
     write(client, (uint8_t *)handshake.c_str(), handshake.length());
 
@@ -592,7 +589,7 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
     client->tcp->readStringUntil('\n', &(client->cHttpLine), std::bind(&WebSocketsClient::handleHeader, this, client, &(client->cHttpLine)));
 #endif
 
-    DEBUG_WEBSOCKETS("[WS-Client][sendHeader] sending header... Done (%luus).\n", (micros() - start));
+    DEBUG_WEBSOCKETS("[WS-Client][sendHeader] sending header... Done (%luus).\n", (millis() - start));
 }
 
 /**
