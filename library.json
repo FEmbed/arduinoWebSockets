@@ -21,5 +21,11 @@
         ]
     },
     "frameworks": "arduino, esp8266-rtos-sdk",
-    "platforms": "custom8266, atmelavr, espressif8266, espressif32"
+    "platforms": "custom8266, atmelavr, espressif8266, espressif32",
+    "dependencies": [ 
+    {
+        "name": "FEmbed-Lwip",
+        "version": ">=0.1.0",
+        "platforms": "custom8266"
+    }]
 }
