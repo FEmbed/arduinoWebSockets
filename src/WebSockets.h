@@ -40,6 +40,8 @@
 #include <functional>
 #endif
 
+#define NODEBUG_WEBSOCKETS
+
 #ifndef NODEBUG_WEBSOCKETS
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_WEBSOCKETS(...) DEBUG_ESP_PORT.printf(__VA_ARGS__)
