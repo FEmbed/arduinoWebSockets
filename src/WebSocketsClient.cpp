@@ -40,6 +40,7 @@ WebSocketsClient::~WebSocketsClient() {
  * calles to init the Websockets server
  */
 void WebSocketsClient::begin(const char * host, uint16_t port, const char * url, const char * protocol) {
+    log_d("begin %s:%d %s(%s)", host, port, url, protocol);
     _host = host;
     _port = port;
 #if defined(HAS_SSL)
