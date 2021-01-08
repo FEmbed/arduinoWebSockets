@@ -59,7 +59,7 @@
 #define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)
 #define WEBSOCKETS_USE_BIG_MEM
 
-#if defined(ESP8266)
+#if defined(ESP8266) || defined(ESP_PLATFORM)
 #include "esp_system.h"
 #define GET_FREE_HEAP esp_get_free_heap_size()
 

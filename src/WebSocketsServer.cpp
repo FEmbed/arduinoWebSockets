@@ -45,8 +45,9 @@ WebSocketsServer::WebSocketsServer(uint16_t port, String origin, String protocol
     _httpHeaderValidationFunc = NULL;
     _mandatoryHttpHeaders     = NULL;
     _mandatoryHttpHeaderCount = 0;
-
+#if !defined(ESP_PLATFORM)
     memset(&_clients[0], 0x00, (sizeof(WSclient_t) * WEBSOCKETS_SERVER_CLIENT_MAX));
+#endif
 }
 
 WebSocketsServer::~WebSocketsServer() {

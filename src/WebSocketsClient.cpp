@@ -169,7 +169,7 @@ void WebSocketsClient::loop(void) {
                 DEBUG_WEBSOCKETS("[WS-Client] setting CA certificate");
 #if defined(ESP32)
                 _client.ssl->setCACert(_CA_cert);
-#elif defined(ESP8266)
+#elif defined(ESP8266) || defined(ESP_PLATFORM)
                 _client.ssl->setCACert((const uint8_t *)_CA_cert, strlen(_CA_cert) + 1);
 #else
 #error setCACert not implemented
