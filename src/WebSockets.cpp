@@ -41,7 +41,11 @@ extern "C" {
 #if defined(ESP8266) && !defined(USE_FEMBED_LWIP)
 #include <Hash.h>
 #elif defined(ESP32)
-#include <hwcrypto/sha.h>
+#if SOC_SHA_SUPPORT_PARALLEL_ENG
+#include "sha/sha_parallel_engine.h"
+#elif SOC_SHA_SUPPORT_DMA
+#include "sha/sha_dma.h"
+#endif
 #else
 
 extern "C" {
