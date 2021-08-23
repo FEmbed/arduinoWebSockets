@@ -192,9 +192,9 @@ void WebSocketsClient::loop(void) {
             return;
         }
 #if defined(ESP32)
-        if(_client.tcp->connect(_host.c_str(), _port, WEBSOCKETS_TCP_TIMEOUT)) {
+        if(_client.tcp->connect(_host.c_str(), _port, WEBSOCKETS_TCP_TIMEOUT) == 0) {
 #else
-        if(_client.tcp->connect(_host.c_str(), _port)) {
+        if(_client.tcp->connect(_host.c_str(), _port) == 0) {
 #endif
             connectedCb();
             _lastConnectionFail = 0;
