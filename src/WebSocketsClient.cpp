@@ -158,7 +158,7 @@ void WebSocketsClient::loop(void) {
 #if defined(HAS_SSL)
         if(_client.isSSL) {
             DEBUG_WEBSOCKETS("[WS-Client] connect wss...\n");
-            if(_client.ssl) {
+            if(_client.ssl && _client.tcp) {
                 delete _client.ssl;
                 _client.ssl = NULL;
                 _client.tcp = NULL;
