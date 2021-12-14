@@ -27,6 +27,7 @@
 
 WebSocketsClient::WebSocketsClient() {
     _cbEvent             = NULL;
+    memset((void *)&_client, 0, sizeof(_client));
     _client.num          = 0;
     _client.cIsClient    = true;
     _client.extraHeaders = WEBSOCKETS_STRING("Origin: file://");
