@@ -40,7 +40,7 @@
 #include <functional>
 #endif
 
-#define NODEBUG_WEBSOCKETS
+//#define NODEBUG_WEBSOCKETS
 
 #ifndef NODEBUG_WEBSOCKETS
 #ifdef DEBUG_ESP_PORT
@@ -257,8 +257,56 @@ typedef struct {
     uint8_t * maskKey;
 } WSMessageHeader_t;
 
-typedef struct {
-    uint8_t num;    ///< connection number
+struct WSclient_t {
+    WSclient_t()
+    {
+        num = 0;
+        status = WSC_NOT_CONNECTED;
+        tcp = NULL;
+
+        isSocketIO = false;
+
+#if defined(HAS_SSL)
+        isSSL = false;
+        ssl = NULL;
+#endif
+        cUrl = String("");
+        cCode = 0;
+
+        cIsClient = false;
+        cIsUpgrade = false;
+        cIsWebsocket = false;
+
+        cSessionId = String("");
+        cKey = String("");
+        cAccept = String("");
+        cProtocol = String("");
+        cExtensions = String("");
+        cVersion = 0;
+
+        cWsRXsize = 0; 
+        memset(cWsHeader, 0, sizeof(cWsHeader));
+        memset(&cWsHeaderDecode, 0, sizeof(cWsHeaderDecode));
+
+        base64Authorization = String("");
+        plainAuthorization = String("");
+        extraHeaders = String("");
+
+        cHttpHeadersValid = false;
+        cMandatoryHeadersCount = 0;
+
+        pongReceived = false;
+        pingInterval = 0;
+        lastPing = 0;
+        pongTimeout = 0;
+        disconnectTimeoutCount = 0;
+        pongTimeoutCount = 0;
+
+#if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
+        cHttpLine = String("");
+#endif
+    }
+    uint8_t num = 0;    ///< connection number
 
     WSclientsStatus_t status;
 
@@ -308,7 +356,7 @@ typedef struct {
     String cHttpLine;    ///< HTTP header lines
 #endif
 
-} WSclient_t;
+};
 
 class WebSockets {
   protected:
