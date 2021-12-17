@@ -570,7 +570,7 @@ void WebSocketsClient::sendHeader(WSclient_t * client) {
         handshake += client->extraHeaders + NEW_LINE;
     }
 
-    handshake += WEBSOCKETS_STRING("User-Agent: arduino-WebSocket-Client\r\n");
+    handshake += WEBSOCKETS_STRING("User-Agent: simple-WSClient\r\n");
 
     if(client->base64Authorization.length() > 0) {
         handshake += WEBSOCKETS_STRING("Authorization: Basic ");
