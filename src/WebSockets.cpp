@@ -601,7 +601,7 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
 
 #else
     unsigned long t = millis();
-    size_t len;
+    int len;
     DEBUG_WEBSOCKETS("[readCb] n: %zu t: %lu\n", n, t);
     while(n > 0) {
         if(client->tcp == NULL) {
@@ -636,13 +636,14 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
         }
 
         len = client->tcp->read((uint8_t *)out, n);
-        if(len) {
+        if(len > 0) {
             t = millis();
             out += len;
             n -= len;
             //DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
         } else {
-            //DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
+            DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
+            break;
         }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
         delay(0);
