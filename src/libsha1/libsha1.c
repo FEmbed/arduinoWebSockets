@@ -18,7 +18,7 @@ A million repetitions of "a"
 /* #define LITTLE_ENDIAN * This should be #define'd already, if true. */
 /* #define SHA1HANDSOFF * Copies data before messing with it. */
 
-#if !defined(ESP8266) && !defined(ESP32)
+#if defined(USE_FEMBED_LWIP) || (!defined(ESP8266) && !(defined(ESP32) && defined(CONFIG_WPA_MBEDTLS_CRYPTO)))
 
 #define SHA1HANDSOFF
 
@@ -26,7 +26,7 @@ A million repetitions of "a"
 #include <string.h>
 #include <stdint.h>
 
-#include "libsha1.h"
+#include "libsha1/libsha1.h"
 
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
