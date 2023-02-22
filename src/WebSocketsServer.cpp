@@ -678,7 +678,7 @@ void WebSocketsServer::handleClientData(void) {
                         break;
                 }
             }
-            else if(len < 0)
+            else
             {
                 WebSockets::clientDisconnect(client, 1002);
             }

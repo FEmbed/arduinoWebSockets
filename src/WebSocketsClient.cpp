@@ -197,7 +197,7 @@ void WebSocketsClient::loop(void) {
         if(_client.tcp->connect(_host.c_str(), _port) == 0) {
 #endif
             connectedCb();
-            _lastConnectionFail = 0;
+            _lastConnectionFail = millis();
         } else {
             connectFailedCb();
             _lastConnectionFail = millis();
@@ -501,9 +501,10 @@ void WebSocketsClient::handleClientData(void) {
                 break;
         }
     }
-    else if(len < 0)
+    else
     {
         // Connected is disconnected
+        _lastConnectionFail = millis();
         WebSockets::clientDisconnect(&_client, 1002);
     }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266) || (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
