@@ -501,7 +501,7 @@ void WebSocketsClient::handleClientData(void) {
                 break;
         }
     }
-    else
+    else if(len < 0)
     {
         // Connected is disconnected
         _lastConnectionFail = millis();

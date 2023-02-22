@@ -628,7 +628,7 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
             return false;
         }
 
-        if(!client->tcp->available()) {
+        if(client->tcp->available() <= 0) {
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
             delay(0);
 #endif
