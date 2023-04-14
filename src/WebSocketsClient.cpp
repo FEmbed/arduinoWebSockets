@@ -197,7 +197,7 @@ void WebSocketsClient::loop(void) {
         if(_client.tcp->connect(_host.c_str(), _port) == 0) {
 #endif
             connectedCb();
-            _lastConnectionFail = 0;
+            _lastConnectionFail = millis();
         } else {
             connectFailedCb();
             _lastConnectionFail = millis();
@@ -484,7 +484,9 @@ bool WebSocketsClient::clientIsConnected(WSclient_t * client) {
  * Handel incomming data from Client
  */
 void WebSocketsClient::handleClientData(void) {
-    int len = _client.tcp->available();
+    int len = -1;
+    if(_client.tcp)
+        len = _client.tcp->available();
     if(len > 0) {
         switch(_client.status) {
             case WSC_HEADER: {
@@ -498,6 +500,12 @@ void WebSocketsClient::handleClientData(void) {
                 WebSockets::clientDisconnect(&_client, 1002);
                 break;
         }
+    }
+    else if(len < 0)
+    {
+        // Connected is disconnected
+        _lastConnectionFail = millis();
+        WebSockets::clientDisconnect(&_client, 1002);
     }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266) || (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
     delay(0);
@@ -705,14 +713,25 @@ void WebSocketsClient::handleHeader(WSclient_t * client, String * headerLine) {
 
             runCbEvent(WStype_CONNECTED, (uint8_t *)client->cUrl.c_str(), client->cUrl.length());
         } else if(clientIsConnected(client) && client->isSocketIO && client->cSessionId.length() > 0) {
-            if(_client.tcp->available()) {
+            int len = -1;
+            if(_client.tcp)
+                len = _client.tcp->available();
+            if(len > 0) {
                 // read not needed data
                 DEBUG_WEBSOCKETS("[WS-Client][handleHeader] still data in buffer (%d), clean up.\n", _client.tcp->available());
-                while(_client.tcp->available() > 0) {
+                len = _client.tcp->available();
+                while(len > 0) {
                     _client.tcp->read();
                 }
             }
-            sendHeader(client);
+            if(len >= 0) {
+                sendHeader(client);
+            }
+            else
+            {
+                _lastConnectionFail = millis();
+                clientDisconnect(client);
+            }
         } else {
             DEBUG_WEBSOCKETS("[WS-Client][handleHeader] no Websocket connection close.\n");
             _lastConnectionFail = millis();
@@ -728,28 +747,31 @@ void WebSocketsClient::connectedCb() {
     DEBUG_WEBSOCKETS("[WS-Client] connected to %s:%u.\n", _host.c_str(), _port);
 
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
-    _client.tcp->onDisconnect(std::bind([](WebSocketsClient * c, AsyncTCPbuffer * obj, WSclient_t * client) -> bool {
-        DEBUG_WEBSOCKETS("[WS-Server][%d] Disconnect client\n", client->num);
-        client->status = WSC_NOT_CONNECTED;
-        client->tcp    = NULL;
+    if(_client.tcp)
+        _client.tcp->onDisconnect(std::bind([](WebSocketsClient * c, AsyncTCPbuffer * obj, WSclient_t * client) -> bool {
+            DEBUG_WEBSOCKETS("[WS-Server][%d] Disconnect client\n", client->num);
+            client->status = WSC_NOT_CONNECTED;
+            client->tcp    = NULL;
 
-        // reconnect
-        c->asyncConnect();
+            // reconnect
+            c->asyncConnect();
 
-        return true;
-    },
-        this, std::placeholders::_1, &_client));
+            return true;
+        },
+            this, std::placeholders::_1, &_client));
 #endif
 
     _client.status = WSC_HEADER;
 
 #if(WEBSOCKETS_NETWORK_TYPE != NETWORK_ESP8266_ASYNC)
     // set Timeout for readBytesUntil and readStringUntil
-    _client.tcp->setTimeout(WEBSOCKETS_TCP_TIMEOUT);
+    if(_client.tcp)
+        _client.tcp->setTimeout(WEBSOCKETS_TCP_TIMEOUT);
 #endif
 
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266) || (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
-    _client.tcp->setNoDelay(true);
+    if(_client.tcp)
+        _client.tcp->setNoDelay(true);
 #endif
 
 #if defined(HAS_SSL)

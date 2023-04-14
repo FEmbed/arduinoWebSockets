@@ -678,6 +678,10 @@ void WebSocketsServer::handleClientData(void) {
                         break;
                 }
             }
+            else if (len < 0)
+            {
+                WebSockets::clientDisconnect(client, 1002);
+            }
         }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
         delay(0);

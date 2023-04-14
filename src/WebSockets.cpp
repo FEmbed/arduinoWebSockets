@@ -601,7 +601,7 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
 
 #else
     unsigned long t = millis();
-    size_t len;
+    int len;
     DEBUG_WEBSOCKETS("[readCb] n: %zu t: %lu\n", n, t);
     while(n > 0) {
         if(client->tcp == NULL) {
@@ -628,7 +628,7 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
             return false;
         }
 
-        if(!client->tcp->available()) {
+        if(client->tcp->available() <= 0) {
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
             delay(0);
 #endif
@@ -636,13 +636,14 @@ bool WebSockets::readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWait
         }
 
         len = client->tcp->read((uint8_t *)out, n);
-        if(len) {
+        if(len > 0) {
             t = millis();
             out += len;
             n -= len;
             //DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
         } else {
-            //DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
+            DEBUG_WEBSOCKETS("Receive %d left %d!\n", len, n);
+            break;
         }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
         delay(0);
@@ -668,7 +669,7 @@ size_t WebSockets::write(WSclient_t * client, uint8_t * out, size_t n) {
     if(client == NULL)
         return 0;
     unsigned long t = millis();
-    size_t len      = 0;
+    int len      = 0;
     size_t total    = 0;
     DEBUG_WEBSOCKETS("[write] n: %zu t: %lu\n", n, t);
     while(n > 0) {
@@ -688,14 +689,15 @@ size_t WebSockets::write(WSclient_t * client, uint8_t * out, size_t n) {
         }
 
         len = client->tcp->write((const uint8_t *)out, n);
-        if(len) {
+        if(len > 0) {
             t = millis();
             out += len;
             n -= len;
             total += len;
             //DEBUG_WEBSOCKETS("write %d left %d!\n", len, n);
         } else {
-            //DEBUG_WEBSOCKETS("write %d failed left %d!\n", len, n);
+            DEBUG_WEBSOCKETS("write %d failed left %d!\n", len, n);
+            break;
         }
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
         delay(0);
@@ -748,6 +750,7 @@ void WebSockets::handleHBTimeout(WSclient_t * client) {
                 if(client->disconnectTimeoutCount && client->pongTimeoutCount >= client->disconnectTimeoutCount) {
                     DEBUG_WEBSOCKETS("[HBtimeout] count=%d, DISCONNECTING\n", client->pongTimeoutCount);
                     clientDisconnect(client);
+                    client->pongTimeoutCount = 0;
                 }
             }
         }

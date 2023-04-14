@@ -8,6 +8,8 @@ set(srcs    "src/WebSockets.cpp"
             "src/WebSocketsClient.cpp"
             "src/WebSocketsServer.cpp"
             "src/SocketIOclient.cpp"
+
+            "src/libsha1/libsha1.c"
             )
 set(include "src" 
             )

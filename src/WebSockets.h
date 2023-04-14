@@ -40,7 +40,7 @@
 #include <functional>
 #endif
 
-//#define NODEBUG_WEBSOCKETS
+// #define NODEBUG_WEBSOCKETS
 
 #ifndef NODEBUG_WEBSOCKETS
 #ifdef DEBUG_ESP_PORT
@@ -52,7 +52,7 @@
 
 #ifndef DEBUG_WEBSOCKETS
 #define DEBUG_WEBSOCKETS(...)
-#define NODEBUG_WEBSOCKETS
+// #define NODEBUG_WEBSOCKETS
 #endif
 
 #ifdef USE_FEMBED_LWIP
