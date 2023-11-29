@@ -624,6 +624,8 @@ void WebSocketsServer::handleNewClients(void) {
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266) || (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
         // store new connection
         WEBSOCKETS_NETWORK_CLASS * tcpClient = new WEBSOCKETS_NETWORK_CLASS(_server->available());
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_FEMBED)
+    WEBSOCKETS_NETWORK_CLASS * tcpClient = _server->rawAccept();
 #else
     WEBSOCKETS_NETWORK_CLASS * tcpClient = new WEBSOCKETS_NETWORK_CLASS(_server->available());
 #endif
